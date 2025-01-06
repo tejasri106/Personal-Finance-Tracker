@@ -1,5 +1,5 @@
 import java.util.Scanner;
-
+import java.io.*;
 /**
  * Main class to run the Personal Finance Tracker application.
  * This program allows users to manage their personal finances by
@@ -27,7 +27,26 @@ public class Main {
         // Initialize a Scanner for user input
         Scanner scanner = new Scanner(System.in);
         int choice; // User's menu choice
-
+        
+        // password handling 
+        String password = loadPassword();
+        if (password == null) {
+            System.out.println("No password set. Please create a new password:");
+            password = scanner.nextLine();
+            savePassword(password);
+            System.out.println("Password saved successfully.");
+        } else {
+            while (true) {
+                System.out.println("Enter your password:");
+                String enteredPassword = scanner.nextLine();
+                if (enteredPassword.equals(password)) {
+                    System.out.println("Password verified. Access granted.");
+                    break;
+                } else {
+                    System.out.println("Incorrect password. Try again.");
+                }
+            }
+        }
         // Prompt the user to enter the current date for transaction logging
         System.out.println("Enter the date (mm/dd/yyyy): ");
         String date = scanner.nextLine();
@@ -67,5 +86,29 @@ public class Main {
 
         // Close the Scanner to release resources
         scanner.close();
+    }
+    
+     /**
+     * Loads the saved password from a file.
+     * @return the password if it exists, or null if no password is saved.
+     */
+    private static String loadPassword() {
+        try (Scanner reader = new Scanner(new FileInputStream("password.txt"))) {
+            return reader.nextLine();
+        } catch (IOException e) {
+            return null; // No password file found
+        }
+    }
+
+    /**
+     * Saves a new password to a file.
+     * @param password the password to save.
+     */
+    private static void savePassword(String password) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("password.txt"))) {
+            writer.println(password);
+        } catch (IOException e) {
+            System.out.println("Error saving password: " + e.getMessage());
+        }
     }
 }
